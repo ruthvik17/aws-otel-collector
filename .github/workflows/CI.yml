@@ -21,9 +21,9 @@ on:
       - test/*
 
     paths-ignore:
-      - '.github/**'
-      - '!.github/workflows/CI.yml'
-      - '**.md'
+      - ".github/**"
+      - "!.github/workflows/CI.yml"
+      - "**.md"
 
   # from collector and contrib repo
   repository_dispatch:
@@ -61,7 +61,7 @@ jobs:
       - name: Check out testing framework
         uses: actions/checkout@v2
         with:
-          repository: 'aws-observability/aws-otel-test-framework'
+          repository: "aws-observability/aws-otel-test-framework"
           path: testing-framework
       - name: Set up Go 1.x
         uses: actions/setup-go@v2
@@ -391,7 +391,7 @@ jobs:
 
   get-testing-region:
     runs-on: ubuntu-latest
-    needs: [ packaging-ssm ]
+    needs: [packaging-ssm]
     outputs:
       region-matrix: ${{ steps.set-matrix.outputs.region-matrix }}
     steps:
@@ -459,7 +459,7 @@ jobs:
 
   e2etest-release-ssm-and-s3:
     runs-on: ubuntu-latest
-    needs: [ e2etest-preparation, get-testing-region ]
+    needs: [e2etest-preparation, get-testing-region]
     strategy:
       fail-fast: true
       matrix: ${{fromJson(needs.get-testing-region.outputs.region-matrix)}}
@@ -505,7 +505,7 @@ jobs:
 
   e2etest-release-image:
     runs-on: ubuntu-latest
-    needs: [ e2etest-preparation ]
+    needs: [e2etest-preparation]
     steps:
       - uses: actions/checkout@v2
 
@@ -565,7 +565,7 @@ jobs:
             public.ecr.aws/${{ env.ECR_REPO }}:latest
           cache-from: type=registry
           cache-to: type=inline
-          platforms : linux/amd64, linux/arm64
+          platforms: linux/amd64, linux/arm64
           labels: ${{ steps.meta.outputs.labels }}
 
   get-testing-suites:
@@ -643,8 +643,8 @@ jobs:
         if: steps.e2etest-ec2-1.outputs.cache-hit != 'true'
         uses: actions/setup-java@v2
         with:
-          distribution: 'zulu'
-          java-version: '11'
+          distribution: "zulu"
+          java-version: "11"
 
       - name: Set up terraform
         if: steps.e2etest-ec2-1.outputs.cache-hit != 'true'
@@ -654,7 +654,7 @@ jobs:
         if: steps.e2etest-ec2-1.outputs.cache-hit != 'true'
         uses: actions/checkout@v2
         with:
-          repository: 'aws-observability/aws-otel-collector-test-framework'
+          repository: "aws-observability/aws-otel-collector-test-framework"
           path: testing-framework
 
       - name: Restore aoutil
@@ -673,7 +673,7 @@ jobs:
           command: |
             opts=""
             cd testing-framework/terraform/ec2
-            terraform init
+            terraform init -var="region=$INTEGRATION_TEST_REGION_1"
             if [[ -f testing-framework/terraform/testcases/${{ matrix.testcase }}/parameters.tfvars ]] ; then
               opts="-var-file=../testcases/${{ matrix.testcase }}/parameters.tfvars"
             fi
@@ -720,8 +720,8 @@ jobs:
         if: steps.e2etest-ec2-2.outputs.cache-hit != 'true'
         uses: actions/setup-java@v2
         with:
-          distribution: 'zulu'
-          java-version: '11'
+          distribution: "zulu"
+          java-version: "11"
 
       - name: Set up terraform
         if: steps.e2etest-ec2-2.outputs.cache-hit != 'true'
@@ -731,7 +731,7 @@ jobs:
         if: steps.e2etest-ec2-2.outputs.cache-hit != 'true'
         uses: actions/checkout@v2
         with:
-          repository: 'aws-observability/aws-otel-collector-test-framework'
+          repository: "aws-observability/aws-otel-collector-test-framework"
           path: testing-framework
 
       - name: Restore aoutil
@@ -750,7 +750,7 @@ jobs:
           command: |
             opts=""
             cd testing-framework/terraform/ec2
-            terraform init
+            terraform init -var="region=$INTEGRATION_TEST_REGION_1"
             if [[ -f testing-framework/terraform/testcases/${{ matrix.testcase }}/parameters.tfvars ]] ; then
               opts="-var-file=../testcases/${{ matrix.testcase }}/parameters.tfvars"
             fi
@@ -797,8 +797,8 @@ jobs:
         if: steps.e2etest-ec2-3.outputs.cache-hit != 'true'
         uses: actions/setup-java@v2
         with:
-          distribution: 'zulu'
-          java-version: '11'
+          distribution: "zulu"
+          java-version: "11"
 
       - name: Set up terraform
         if: steps.e2etest-ec2-3.outputs.cache-hit != 'true'
@@ -808,7 +808,7 @@ jobs:
         if: steps.e2etest-ec2-3.outputs.cache-hit != 'true'
         uses: actions/checkout@v2
         with:
-          repository: 'aws-observability/aws-otel-collector-test-framework'
+          repository: "aws-observability/aws-otel-collector-test-framework"
           path: testing-framework
 
       - name: Restore aoutil
@@ -827,7 +827,7 @@ jobs:
           command: |
             opts=""
             cd testing-framework/terraform/ec2
-            terraform init
+            terraform init -var="region=$INTEGRATION_TEST_REGION_2"
             if [[ -f testing-framework/terraform/testcases/${{ matrix.testcase }}/parameters.tfvars ]] ; then
               opts="-var-file=../testcases/${{ matrix.testcase }}/parameters.tfvars"
             fi
@@ -874,8 +874,8 @@ jobs:
         if: steps.e2etest-ecs.outputs.cache-hit != 'true'
         uses: actions/setup-java@v2
         with:
-          distribution: 'zulu'
-          java-version: '11'
+          distribution: "zulu"
+          java-version: "11"
 
       - name: Set up terraform
         if: steps.e2etest-ecs.outputs.cache-hit != 'true'
@@ -885,7 +885,7 @@ jobs:
         if: steps.e2etest-ecs.outputs.cache-hit != 'true'
         uses: actions/checkout@v2
         with:
-          repository: 'aws-observability/aws-otel-collector-test-framework'
+          repository: "aws-observability/aws-otel-collector-test-framework"
           path: testing-framework
 
       - name: Run testing suite on ecs
@@ -897,7 +897,7 @@ jobs:
           command: |
             opts=""
             cd testing-framework/terraform/ecs
-            terraform init
+            terraform init -var="region=$INTEGRATION_TEST_REGION_2"
             if [[ -f testing-framework/terraform/testcases/${{ matrix.testcase }}/parameters.tfvars ]] ; then
               opts="-var-file=../testcases/${{ matrix.testcase }}/parameters.tfvars"
             fi
@@ -944,8 +944,8 @@ jobs:
         if: steps.e2etest-eks.outputs.cache-hit != 'true'
         uses: actions/setup-java@v2
         with:
-          distribution: 'zulu'
-          java-version: '11'
+          distribution: "zulu"
+          java-version: "11"
 
       - name: Set up terraform
         if: steps.e2etest-eks.outputs.cache-hit != 'true'
@@ -955,7 +955,7 @@ jobs:
         if: steps.e2etest-eks.outputs.cache-hit != 'true'
         uses: actions/checkout@v2
         with:
-          repository: 'aws-observability/aws-otel-collector-test-framework'
+          repository: "aws-observability/aws-otel-collector-test-framework"
           path: testing-framework
 
       - name: Run testing suite on eks
@@ -966,8 +966,8 @@ jobs:
             opts="-var-file=../testcases/${{ matrix.testcase }}/parameters.tfvars"
           fi
           cd testing-framework/terraform/eks
-          terraform init
-          terraform apply -auto-approve -lock=false $opts -var="aoc_version=${{ needs.e2etest-preparation.outputs.version }}" -var="testcase=../testcases/${{ matrix.testcase }}"
+          terraform init -var="region=$INTEGRATION_TEST_REGION_2"
+          terraform apply -auto-approve -lock=false $opts -var="region=$INTEGRATION_TEST_REGION_2" -var="aoc_version=${{ needs.e2etest-preparation.outputs.version }}" -var="testcase=../testcases/${{ matrix.testcase }}"
 
       - name: Destroy resources
         if: ${{ always() && steps.e2etest-eks.outputs.cache-hit != 'true' }}
@@ -1005,8 +1005,8 @@ jobs:
         if: steps.e2etest-eks-fargate.outputs.cache-hit != 'true'
         uses: actions/setup-java@v2
         with:
-          distribution: 'zulu'
-          java-version: '11'
+          distribution: "zulu"
+          java-version: "11"
 
       - name: Set up terraform
         if: steps.e2etest-eks-fargate.outputs.cache-hit != 'true'
@@ -1016,7 +1016,7 @@ jobs:
         if: steps.e2etest-eks-fargate.outputs.cache-hit != 'true'
         uses: actions/checkout@v2
         with:
-          repository: 'aws-observability/aws-otel-collector-test-framework'
+          repository: "aws-observability/aws-otel-collector-test-framework"
           path: testing-framework
 
       - name: Run testing suite on eks
@@ -1028,7 +1028,7 @@ jobs:
           command: |
             opts=""
             cd testing-framework/terraform/eks
-            terraform init
+            terraform init -var="region=$INTEGRATION_TEST_REGION_2"
             if [[ -f testing-framework/terraform/testcases/${{ matrix.testcase }}/parameters.tfvars ]] ; then
               opts="-var-file=../testcases/${{ matrix.testcase }}/parameters.tfvars"
             fi
@@ -1075,8 +1075,8 @@ jobs:
         if: steps.e2etest-eks-adot-operator.outputs.cache-hit != 'true'
         uses: actions/setup-java@v2
         with:
-          distribution: 'zulu'
-          java-version: '11'
+          distribution: "zulu"
+          java-version: "11"
 
       - name: Set up terraform
         if: steps.e2etest-eks-adot-operator.outputs.cache-hit != 'true'
@@ -1086,7 +1086,7 @@ jobs:
         if: steps.e2etest-eks-adot-operator.outputs.cache-hit != 'true'
         uses: actions/checkout@v2
         with:
-          repository: 'aws-observability/aws-otel-collector-test-framework'
+          repository: "aws-observability/aws-otel-collector-test-framework"
           path: testing-framework
 
       - name: Run ADOT Operator testing suite on eks
@@ -1108,7 +1108,16 @@ jobs:
   release-candidate:
     runs-on: ubuntu-latest
     if: github.event_name == 'push' # only create the artifact when there's a push, not for dispatch.
-    needs: [e2etest-eks, e2etest-eks-adot-operator, e2etest-eks-fargate, e2etest-ecs, e2etest-ec2-1, e2etest-ec2-2, e2etest-ec2-3]
+    needs:
+      [
+        e2etest-eks,
+        e2etest-eks-adot-operator,
+        e2etest-eks-fargate,
+        e2etest-ecs,
+        e2etest-ec2-1,
+        e2etest-ec2-2,
+        e2etest-ec2-3,
+      ]
     steps:
       - name: Configure AWS Credentials
         uses: aws-actions/configure-aws-credentials@v1
@@ -1146,7 +1155,17 @@ jobs:
   clean-ssm-package:
     runs-on: ubuntu-latest
     if: ${{ always() }}
-    needs: [ e2etest-eks, e2etest-eks-adot-operator, e2etest-eks-fargate, e2etest-ecs, e2etest-ec2-1, e2etest-ec2-2, e2etest-ec2-3, get-testing-region ]
+    needs:
+      [
+        e2etest-eks,
+        e2etest-eks-adot-operator,
+        e2etest-eks-fargate,
+        e2etest-ecs,
+        e2etest-ec2-1,
+        e2etest-ec2-2,
+        e2etest-ec2-3,
+        get-testing-region,
+      ]
     strategy:
       fail-fast: false
       matrix: ${{fromJson(needs.get-testing-region.outputs.region-matrix)}}
@@ -1171,5 +1190,3 @@ jobs:
           ssm_pkg_version=`cat build/packages/VERSION`
           aws ssm describe-document --name ${SSM_PACKAGE_NAME} --version-name ${ssm_pkg_version} >/dev/null 2>&1 && \
               aws ssm delete-document --name ${SSM_PACKAGE_NAME} --version-name ${ssm_pkg_version}
-
-
