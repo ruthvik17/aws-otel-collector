@@ -674,7 +674,9 @@ jobs:
             opts=""
             cd testing-framework/terraform/ec2
             terraform init -var="region=$INTEGRATION_TEST_REGION_1"
+
             terraform plan
+
             if [[ -f testing-framework/terraform/testcases/${{ matrix.testcase }}/parameters.tfvars ]] ; then
               opts="-var-file=../testcases/${{ matrix.testcase }}/parameters.tfvars"
             fi
