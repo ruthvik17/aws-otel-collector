@@ -534,6 +534,7 @@ jobs:
 
   get-testing-suites:
     runs-on: ubuntu-latest
+    if: github.event_name == 'push' && !contains(github.ref,'refs/heads/test/')
     outputs:
       eks-matrix: ${{ steps.set-matrix.outputs.eks-matrix }}
       eks-arm64-matrix: ${{ steps.set-matrix.outputs.eks-arm64-matrix }}
@@ -617,8 +618,6 @@ jobs:
       - name: Set up terraform
         if: steps.e2etest-ec2-1.outputs.cache-hit != 'true'
         uses: hashicorp/setup-terraform@v1
-        with:
-          terraform_wrapper: false
 
       - name: Check out testing framework
         if: steps.e2etest-ec2-1.outputs.cache-hit != 'true'
@@ -644,15 +643,7 @@ jobs:
             if [[ -f testing-framework/terraform/testcases/${{ matrix.testcase }}/parameters.tfvars ]] ; then opts="-var-file=../testcases/${{ matrix.testcase }}/parameters.tfvars" ; else opts="" ; fi
             cd testing-framework/terraform/ec2
             terraform init
-            if terraform apply -auto-approve -lock=false $opts -var="testing_ami=${{ matrix.testing_ami }}" -var="aoc_version=${{ needs.e2etest-preparation.outputs.version }}" -var="testcase=../testcases/${{ matrix.testcase }}" ; then
-              testing_id=$(terraform output -raw testing_id)
-              cd ../add_on/remote_state && terraform init && terraform apply -auto-approve -var="platform=ec2" -var="s3_folder_name=adot-ci-integration-test/ec2-1" -var="testing_id=$testing_id" -var="testcase=../../testcases/${{ matrix.testcase }}"
-              cd ../../ec2 && terraform destroy -auto-approve
-            else
-              testing_id=$(terraform output -raw testing_id)
-              cd ../add_on/remote_state && terraform init && terraform apply -auto-approve -var="platform=ec2" -var="s3_folder_name=adot-ci-integration-test/ec2-1" -var="testing_id=$testing_id" -var="testcase=../../testcases/${{ matrix.testcase }}"
-              cd ../../ec2 && terraform destroy -auto-approve && exit 1
-            fi
+            if terraform apply -auto-approve -lock=false $opts -var="testing_ami=${{ matrix.testing_ami }}" -var="aoc_version=${{ needs.e2etest-preparation.outputs.version }}" -var="testcase=../testcases/${{ matrix.testcase }}" ; then terraform destroy -auto-approve ; else terraform destroy -auto-approve && exit 1 ; fi
 
       #This is here just in case workflow cancel
       - name: Destroy resources
@@ -697,8 +688,6 @@ jobs:
       - name: Set up terraform
         if: steps.e2etest-ec2-2.outputs.cache-hit != 'true'
         uses: hashicorp/setup-terraform@v1
-        with:
-          terraform_wrapper: false
 
       - name: Check out testing framework
         if: steps.e2etest-ec2-2.outputs.cache-hit != 'true'
@@ -724,15 +713,7 @@ jobs:
             if [[ -f testing-framework/terraform/testcases/${{ matrix.testcase }}/parameters.tfvars ]] ; then opts="-var-file=../testcases/${{ matrix.testcase }}/parameters.tfvars" ; else opts="" ; fi
             cd testing-framework/terraform/ec2
             terraform init
-            if terraform apply -auto-approve -lock=false $opts -var="testing_ami=${{ matrix.testing_ami }}" -var="aoc_version=${{ needs.e2etest-preparation.outputs.version }}" -var="testcase=../testcases/${{ matrix.testcase }}" ; then
-              testing_id=$(terraform output -raw testing_id)
-              cd ../add_on/remote_state && terraform init && terraform apply -auto-approve -var="platform=ec2" -var="s3_folder_name=adot-ci-integration-test/ec2-2" -var="testing_id=$testing_id" -var="testcase=../../testcases/${{ matrix.testcase }}"
-              cd ../../ec2 && terraform destroy -auto-approve
-            else
-              testing_id=$(terraform output -raw testing_id)
-              cd ../add_on/remote_state && terraform init && terraform apply -auto-approve -var="platform=ec2" -var="s3_folder_name=adot-ci-integration-test/ec2-2" -var="testing_id=$testing_id" -var="testcase=../../testcases/${{ matrix.testcase }}"
-              cd ../../ec2 && terraform destroy -auto-approve && exit 1
-            fi
+            if terraform apply -auto-approve -lock=false $opts -var="testing_ami=${{ matrix.testing_ami }}" -var="aoc_version=${{ needs.e2etest-preparation.outputs.version }}" -var="testcase=../testcases/${{ matrix.testcase }}" ; then terraform destroy -auto-approve ; else terraform destroy -auto-approve && exit 1 ; fi
 
       #This is here just in case workflow cancel
       - name: Destroy resources
@@ -777,8 +758,6 @@ jobs:
       - name: Set up terraform
         if: steps.e2etest-ec2-3.outputs.cache-hit != 'true'
         uses: hashicorp/setup-terraform@v1
-        with:
-          terraform_wrapper: false
 
       - name: Check out testing framework
         if: steps.e2etest-ec2-3.outputs.cache-hit != 'true'
@@ -804,19 +783,7 @@ jobs:
             if [[ -f testing-framework/terraform/testcases/${{ matrix.testcase }}/parameters.tfvars ]] ; then opts="-var-file=../testcases/${{ matrix.testcase }}/parameters.tfvars" ; else opts="" ; fi
             cd testing-framework/terraform/ec2
             terraform init
-            if terraform apply -auto-approve -lock=false $opts -var="testing_ami=${{ matrix.testing_ami }}" -var="aoc_version=${{ needs.e2etest-preparation.outputs.version }}" -var="testcase=../testcases/${{ matrix.testcase }}" ; then
-              testing_id=$(terraform output -raw testing_id)
-              #Upload test case's terraform state
-              cd ../add_on/remote_state && terraform init && terraform apply -auto-approve -var="platform=ec2" -var="s3_folder_name=adot-ci-integration-test/ec2-3" -var="testing_id=$testing_id" -var="testcase=../../testcases/${{ matrix.testcase }}"
-              #Destroy resources created by test case
-              cd ../../ec2 && terraform destroy -auto-approve
-            else
-              testing_id=$(terraform output -raw testing_id)
-              #Upload test case's terraform state
-              cd ../add_on/remote_state && terraform init && terraform apply -auto-approve -var="platform=ec2" -var="s3_folder_name=adot-ci-integration-test/ec2-3" -var="testing_id=$testing_id" -var="testcase=../../testcases/${{ matrix.testcase }}"
-              #Destroy resources created by test case
-              cd ../../ec2 && terraform destroy -auto-approve && exit 1
-            fi
+            if terraform apply -auto-approve -lock=false $opts -var="testing_ami=${{ matrix.testing_ami }}" -var="aoc_version=${{ needs.e2etest-preparation.outputs.version }}" -var="testcase=../testcases/${{ matrix.testcase }}" ; then terraform destroy -auto-approve ; else terraform destroy -auto-approve && exit 1 ; fi
 
       #This is here just in case workflow cancel
       - name: Destroy resources
@@ -861,8 +828,6 @@ jobs:
       - name: Set up terraform
         if: steps.e2etest-ecs.outputs.cache-hit != 'true'
         uses: hashicorp/setup-terraform@v1
-        with:
-          terraform_wrapper: false
 
       - name: Check out testing framework
         if: steps.e2etest-ecs.outputs.cache-hit != 'true'
@@ -881,15 +846,7 @@ jobs:
             if [[ -f testing-framework/terraform/testcases/${{ matrix.testcase }}/parameters.tfvars ]] ; then opts="-var-file=../testcases/${{ matrix.testcase }}/parameters.tfvars" ; else opts="" ; fi
             cd testing-framework/terraform/ecs
             terraform init
-            if terraform apply -auto-approve -lock=false $opts -var="ecs_launch_type=${{ matrix.launch_type }}" -var="aoc_version=${{ needs.e2etest-preparation.outputs.version }}" -var="testcase=../testcases/${{ matrix.testcase }}" ; then
-              testing_id=$(terraform output -raw testing_id)
-              cd ../add_on/remote_state && terraform init && terraform apply -auto-approve -var="platform=ecs" -var="s3_folder_name=adot-ci-integration-test/ecs" -var="testing_id=$testing_id" -var="testcase=../../testcases/${{ matrix.testcase }}"
-              cd ../../ecs && terraform destroy -auto-approve
-            else
-              testing_id=$(terraform output -raw testing_id)
-              cd ../add_on/remote_state && terraform init && terraform apply -auto-approve -var="platform=ecs" -var="s3_folder_name=adot-ci-integration-test/ecs" -var="testing_id=$testing_id" -var="testcase=../../testcases/${{ matrix.testcase }}"
-              cd ../../ecs && terraform destroy -auto-approve && exit 1
-            fi
+            if terraform apply -auto-approve -lock=false $opts -var="ecs_launch_type=${{ matrix.launch_type }}" -var="aoc_version=${{ needs.e2etest-preparation.outputs.version }}" -var="testcase=../testcases/${{ matrix.testcase }}" ; then terraform destroy -auto-approve ; else terraform destroy -auto-approve && exit 1 ; fi
 
       #This is here just in case workflow cancel
       - name: Destroy resources
@@ -934,8 +891,6 @@ jobs:
       - name: Set up terraform
         if: steps.e2etest-eks.outputs.cache-hit != 'true'
         uses: hashicorp/setup-terraform@v1
-        with:
-          terraform_wrapper: false
 
       - name: Check out testing framework
         if: steps.e2etest-eks.outputs.cache-hit != 'true'
@@ -945,18 +900,10 @@ jobs:
           path: testing-framework
 
       - name: Run testing suite on eks
-        id: run_eks_test
         if: steps.e2etest-eks.outputs.cache-hit != 'true'
         run: |
           if [[ -f testing-framework/terraform/testcases/${{ matrix.testcase }}/parameters.tfvars ]] ; then opts="-var-file=../testcases/${{ matrix.testcase }}/parameters.tfvars" ; else opts="" ; fi
           cd testing-framework/terraform/eks && terraform init && terraform apply -auto-approve -lock=false $opts -var="aoc_version=${{ needs.e2etest-preparation.outputs.version }}" -var="testcase=../testcases/${{ matrix.testcase }}"
-
-      - name: Upload test case's terraform state
-        if: ${{ always() && steps.e2etest-eks.outputs.cache-hit != 'true' }}
-        run: |
-          cd testing-framework/terraform/eks
-          testing_id=$(terraform output -raw testing_id)
-          cd ../add_on/remote_state && terraform init && terraform apply -auto-approve -var="platform=eks" -var="s3_folder_name=adot-ci-integration-test/eks" -var="testing_id=$testing_id" -var="testcase=../../testcases/${{ matrix.testcase }}"
 
       - name: Destroy resources
         if: ${{ always() && steps.e2etest-eks.outputs.cache-hit != 'true' }}
@@ -1014,13 +961,6 @@ jobs:
           if [[ -f testing-framework/terraform/testcases/${{ matrix.testcase }}/parameters.tfvars ]] ; then opts="-var-file=../testcases/${{ matrix.testcase }}/parameters.tfvars" ; else opts="" ; fi
           cd testing-framework/terraform/eks && terraform init && terraform apply -auto-approve -lock=false $opts -var="aoc_version=${{ needs.e2etest-preparation.outputs.version }}" -var="testcase=../testcases/${{ matrix.testcase }}" -var="region=us-east-2" -var="eks_cluster_name=integ-test-arm64-cluster" -var="cortex_instance_endpoint=${{ env.US_EAST_2_AMP_ENDPOINT }}"
 
-      - name: Upload test case's terraform state
-        if: ${{ always() && steps.e2etest-eks-arm64.outputs.cache-hit != 'true' }}
-        run: |
-          cd testing-framework/terraform/eks
-          testing_id=$(terraform output -raw testing_id)
-          cd ../add_on/remote_state && terraform init && terraform apply -auto-approve -var="platform=eks" -var="s3_folder_name=adot-ci-integration-test/eks-arm64" -var="testing_id=$testing_id" -var="testcase=../../testcases/${{ matrix.testcase }}"
-
       - name: Destroy resources
         if: ${{ always() && steps.e2etest-eks-arm64.outputs.cache-hit != 'true' }}
         run: |
@@ -1064,8 +1004,6 @@ jobs:
       - name: Set up terraform
         if: steps.e2etest-eks-fargate.outputs.cache-hit != 'true'
         uses: hashicorp/setup-terraform@v1
-        with:
-          terraform_wrapper: false
 
       - name: Check out testing framework
         if: steps.e2etest-eks-fargate.outputs.cache-hit != 'true'
@@ -1082,25 +1020,15 @@ jobs:
           timeout_minutes: 120
           command: |
             if [[ -f testing-framework/terraform/testcases/${{ matrix.testcase }}/parameters.tfvars ]] ; then opts="-var-file=../testcases/${{ matrix.testcase }}/parameters.tfvars" ; else opts="" ; fi
-
             cd testing-framework/terraform/eks
             terraform init
-            if terraform apply -auto-approve -lock=false $opts -var="aoc_version=${{ needs.e2etest-preparation.outputs.version }}" -var="testcase=../testcases/${{ matrix.testcase }}" ; then
-              testing_id=$(terraform output -raw testing_id)
-              cd ../add_on/remote_state && terraform init && terraform apply -auto-approve -var="platform=eks" -var="s3_folder_name=adot-ci-integration-test/eks-fargate" -var="testing_id=$testing_id" -var="testcase=../../testcases/${{ matrix.testcase }}"
-              cd ../../eks && terraform destroy -auto-approve $opts
-            else
-              testing_id=$(terraform output -raw testing_id)
-              cd ../add_on/remote_state && terraform init && terraform apply -auto-approve -var="platform=eks" -var="s3_folder_name=adot-ci-integration-test/eks-fargate" -var="testing_id=$testing_id" -var="testcase=../../testcases/${{ matrix.testcase }}"
-              cd ../../eks && terraform destroy -auto-approve $opts && exit 1
-            fi
+            if terraform apply -auto-approve -lock=false $opts -var="aoc_version=${{ needs.e2etest-preparation.outputs.version }}" -var="testcase=../testcases/${{ matrix.testcase }}" ; then terraform destroy -auto-approve -var-file="../testcases/${{ matrix.testcase }}/parameters.tfvars" ; else terraform destroy -auto-approve -var-file="../testcases/${{ matrix.testcase }}/parameters.tfvars" && exit 1 ; fi
 
       #This is here just in case workflow cancel
       - name: Destroy resources
         if: ${{ cancelled() && steps.e2etest-eks-fargate.outputs.cache-hit != 'true' }}
         run: |
-          if [[ -f testing-framework/terraform/testcases/${{ matrix.testcase }}/parameters.tfvars ]] ; then opts="-var-file=../testcases/${{ matrix.testcase }}/parameters.tfvars" ; else opts="" ; fi
-          cd testing-framework/terraform/eks && terraform destroy -auto-approve $opts
+          cd testing-framework/terraform/eks && terraform destroy -auto-approve
 
   e2etest-eks-adot-operator:
     runs-on: ubuntu-latest
@@ -1139,8 +1067,6 @@ jobs:
       - name: Set up terraform
         if: steps.e2etest-eks-adot-operator.outputs.cache-hit != 'true'
         uses: hashicorp/setup-terraform@v1
-        with:
-          terraform_wrapper: false
 
       - name: Check out testing framework
         if: steps.e2etest-eks-adot-operator.outputs.cache-hit != 'true'
@@ -1150,30 +1076,19 @@ jobs:
           path: testing-framework
 
       - name: Run ADOT Operator testing suite on eks
-        id: run_eks_adot_operator_test
         if: steps.e2etest-eks-adot-operator.outputs.cache-hit != 'true'
         run: |
           if [[ -f testing-framework/terraform/testcases/${{ matrix.testcase }}/parameters.tfvars ]] ; then opts="-var-file=../testcases/${{ matrix.testcase }}/parameters.tfvars" ; else opts="" ; fi
-          cd testing-framework/terraform/eks
-          terraform init
-          terraform apply -auto-approve $opts -var="aoc_version=${{ needs.e2etest-preparation.outputs.version }}" -var="testcase=../testcases/${{ matrix.testcase }}"
-
-      - name: Upload test case's terraform state
-        if: ${{ always() && steps.e2etest-eks-adot-operator.outputs.cache-hit != 'true' }}
-        run: |
-          cd testing-framework/terraform/eks
-          testing_id=$(terraform output -raw testing_id)
-          cd ../add_on/remote_state && terraform init && terraform apply -auto-approve -var="platform=eks" -var="s3_folder_name=adot-ci-integration-test/eks-adot-operator" -var="testing_id=$testing_id" -var="testcase=../../testcases/${{ matrix.testcase }}"
+          cd testing-framework/terraform/eks && terraform init && terraform apply -auto-approve $opts -var="aoc_version=${{ needs.e2etest-preparation.outputs.version }}" -var="testcase=../testcases/${{ matrix.testcase }}"
 
       - name: Destroy resources
         if: ${{ always() && steps.e2etest-eks-adot-operator.outputs.cache-hit != 'true' }}
         run: |
-          if [[ -f testing-framework/terraform/testcases/${{ matrix.testcase }}/parameters.tfvars ]] ; then opts="-var-file=../testcases/${{ matrix.testcase }}/parameters.tfvars" ; else opts="" ; fi
-          cd testing-framework/terraform/eks && terraform destroy -auto-approve $opts
+          cd testing-framework/terraform/eks && terraform destroy -auto-approve -var-file="../testcases/${{ matrix.testcase }}/parameters.tfvars"
 
   release-candidate:
     runs-on: ubuntu-latest
-    if: github.event_name == 'push' # only create the artifact when there's a push, not for dispatch.
+    if: github.event_name == 'push' && !contains(github.ref,'refs/heads/test/') # only create the artifact when there's a push, not for dispatch.
     needs: [e2etest-eks, e2etest-eks-arm64, e2etest-eks-adot-operator, e2etest-eks-fargate, e2etest-ecs, e2etest-ec2-1, e2etest-ec2-2, e2etest-ec2-3]
     steps:
       - name: Configure AWS Credentials
