@@ -536,6 +536,7 @@ jobs:
     runs-on: ubuntu-latest
     outputs:
       eks-matrix: ${{ steps.set-matrix.outputs.eks-matrix }}
+      eks-arm64-matrix: ${{ steps.set-matrix.outputs.eks-arm64-matrix }}
       eks-fargate-matrix: ${{ steps.set-matrix.outputs.eks-fargate-matrix }}
       eks-adot-operator-matrix: ${{ steps.set-matrix.outputs.eks-adot-operator-matrix }}
       ecs-matrix: ${{ steps.set-matrix.outputs.ecs-matrix }}
@@ -557,9 +558,11 @@ jobs:
           ec2_matrix_3=$(python e2etest/get-testcases.py ec2_matrix_3)
           ecs_matrix=$(python e2etest/get-testcases.py ecs_matrix)
           eks_matrix=$(python e2etest/get-testcases.py eks_matrix)
+          eks_arm64_matrix=$(python e2etest/get-testcases.py eks_arm64_matrix)
           eks_fargate_matrix=$(python e2etest/get-testcases.py eks_fargate_matrix)
           eks_adot_operator_matrix=$(python e2etest/get-testcases.py eks_adot_operator_matrix)
           echo "::set-output name=eks-matrix::$eks_matrix"
+          echo "::set-output name=eks-arm64-matrix::$eks_arm64_matrix"
           echo "::set-output name=eks-fargate-matrix::$eks_fargate_matrix"
           echo "::set-output name=eks-adot-operator-matrix::$eks_adot_operator_matrix"
           echo "::set-output name=ecs-matrix::$ecs_matrix"
@@ -569,6 +572,7 @@ jobs:
       - name: List testing suites
         run: |
           echo ${{ steps.set-matrix.outputs.eks-matrix }}
+          echo ${{ steps.set-matrix.outputs.eks-arm64-matrix }}
           echo ${{ steps.set-matrix.outputs.eks-fargate-matrix }}
           echo ${{ steps.set-matrix.outputs.eks-adot-operator-matrix }}
           echo ${{ steps.set-matrix.outputs.ecs-matrix }}
@@ -905,6 +909,61 @@ jobs:
         run: |
           cd testing-framework/terraform/eks && terraform destroy -auto-approve
 
+  e2etest-eks-arm64:
+    runs-on: ubuntu-latest
+    needs: [get-testing-suites, e2etest-release, e2etest-preparation]
+    strategy:
+      fail-fast: false
+      max-parallel: 5
+      matrix: ${{ fromJson(needs.get-testing-suites.outputs.eks-arm64-matrix) }}
+
+    steps:
+      - uses: actions/checkout@v2
+
+      - name: Cache if success
+        id: e2etest-eks-arm64
+        uses: actions/cache@v2
+        with:
+          path: |
+            VERSION
+          key: e2etest-eks-arm64-${{ github.run_id }}-${{ matrix.testcase }}
+
+      - name: Configure AWS Credentials
+        if: steps.e2etest-eks-arm64.outputs.cache-hit != 'true'
+        uses: aws-actions/configure-aws-credentials@v1
+        with:
+          aws-access-key-id: ${{ secrets.INTEG_TEST_AWS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.INTEG_TEST_AWS_KEY_SECRET }}
+          aws-region: us-east-2
+
+      - name: Set up JDK 11
+        if: steps.e2etest-eks-arm64.outputs.cache-hit != 'true'
+        uses: actions/setup-java@v2
+        with:
+          distribution: 'zulu'
+          java-version: '11'
+
+      - name: Set up terraform
+        if: steps.e2etest-eks-arm64.outputs.cache-hit != 'true'
+        uses: hashicorp/setup-terraform@v1
+
+      - name: Check out testing framework
+        if: steps.e2etest-eks-arm64.outputs.cache-hit != 'true'
+        uses: actions/checkout@v2
+        with:
+          repository: 'aws-observability/aws-otel-collector-test-framework'
+          path: testing-framework
+
+      - name: Run testing suite on eks
+        if: steps.e2etest-eks-arm64.outputs.cache-hit != 'true'
+        run: |
+          if [[ -f testing-framework/terraform/testcases/${{ matrix.testcase }}/parameters.tfvars ]] ; then opts="-var-file=../testcases/${{ matrix.testcase }}/parameters.tfvars" ; else opts="" ; fi
+          cd testing-framework/terraform/eks && terraform init && terraform apply -auto-approve -lock=false $opts -var="aoc_version=${{ needs.e2etest-preparation.outputs.version }}" -var="testcase=../testcases/${{ matrix.testcase }}" -var="region=us-east-2" -var="eks_cluster_name=integ-test-arm64-cluster" -var="cortex_instance_endpoint=${{ env.US_EAST_2_AMP_ENDPOINT }}"
+
+      - name: Destroy resources
+        if: ${{ always() && steps.e2etest-eks-arm64.outputs.cache-hit != 'true' }}
+        run: |
+          cd testing-framework/terraform/eks && terraform destroy -auto-approve -var="region=us-east-2" -var="eks_cluster_name=integ-test-arm64-cluster"
 
   e2etest-eks-fargate:
     runs-on: ubuntu-latest
@@ -1028,7 +1087,7 @@ jobs:
   release-candidate:
     runs-on: ubuntu-latest
     if: github.event_name == 'push' # only create the artifact when there's a push, not for dispatch.
-    needs: [e2etest-eks, e2etest-eks-adot-operator, e2etest-eks-fargate, e2etest-ecs, e2etest-ec2-1, e2etest-ec2-2, e2etest-ec2-3]
+    needs: [e2etest-eks, e2etest-eks-arm64, e2etest-eks-adot-operator, e2etest-eks-fargate, e2etest-ecs, e2etest-ec2-1, e2etest-ec2-2, e2etest-ec2-3]
     steps:
       - name: Configure AWS Credentials
         uses: aws-actions/configure-aws-credentials@v1
