@@ -671,10 +671,8 @@ jobs:
           max_attempts: 3
           timeout_minutes: 120
           command: |
-            opts=""
-            if [[ -f testing-framework/terraform/testcases/${{ matrix.testcase }}/parameters.tfvars ]] ; then
-              opts="-var-file=../testcases/${{ matrix.testcase }}/parameters.tfvars"
-            fi
+            if [[ -f testing-framework/terraform/testcases/${{ matrix.testcase }}/parameters.tfvars ]] ; then opts="-var-file=../testcases/${{ matrix.testcase }}/parameters.tfvars" ; else opts="" ; fi
+
             cd testing-framework/terraform/ec2
             terraform init -var="region=${{ env.INTEGRATION_TEST_REGION_1 }}"
 
@@ -752,10 +750,8 @@ jobs:
           max_attempts: 3
           timeout_minutes: 120
           command: |
-            opts=""
-            if [[ -f testing-framework/terraform/testcases/${{ matrix.testcase }}/parameters.tfvars ]] ; then
-              opts="-var-file=../testcases/${{ matrix.testcase }}/parameters.tfvars"
-            fi
+            if [[ -f testing-framework/terraform/testcases/${{ matrix.testcase }}/parameters.tfvars ]] ; then opts="-var-file=../testcases/${{ matrix.testcase }}/parameters.tfvars" ; else opts="" ; fi
+
             cd testing-framework/terraform/ec2
             terraform init -var="region=${{ env.INTEGRATION_TEST_REGION_1 }}"
             terraform plan $opts -var="region=${{ env.INTEGRATION_TEST_REGION_1 }}" -var="testing_ami=${{ matrix.testing_ami }}" -var="aoc_version=${{ needs.e2etest-preparation.outputs.version }}" -var="testcase=../testcases/${{ matrix.testcase }}" -var="cortex_instance_endpoint=${{ env.INTEGRATION_TEST_AMP_1 }}"
