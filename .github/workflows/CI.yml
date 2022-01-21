@@ -642,7 +642,12 @@ jobs:
             if [[ -f testing-framework/terraform/testcases/${{ matrix.testcase }}/parameters.tfvars ]] ; then opts="-var-file=../testcases/${{ matrix.testcase }}/parameters.tfvars" ; else opts="" ; fi
             cd testing-framework/terraform/ec2
             terraform init
-            if terraform apply -auto-approve -lock=false $opts -var="region=us-east-1" -var="cortex_instance_endpoint=https://aps-workspaces.us-east-1.amazonaws.com/workspaces/ws-482cafe5-8d66-4099-8cb3-de5f0e6855d6" -var="testing_ami=${{ matrix.testing_ami }}" -var="aoc_version=${{ needs.e2etest-preparation.outputs.version }}" -var="testcase=../testcases/${{ matrix.testcase }}" ; then terraform destroy -auto-approve ; else terraform destroy -auto-approve && exit 1 ; fi
+            if terraform apply -auto-approve -lock=false $opts -var="region=us-east-2" -var="cortex_instance_endpoint=https://aps-workspaces.us-east-2.amazonaws.com/workspaces/ws-1de68e95-0680-42bb-8e55-67e7fd5d0861" -var="testing_ami=${{ matrix.testing_ami }}" -var="aoc_version=${{ needs.e2etest-preparation.outputs.version }}" -var="testcase=../testcases/${{ matrix.testcase }}" ; then
+              terraform destroy -auto-approve
+            else
+              terraform apply -auto-approve -lock=false $opts -var="region=us-east-2" -var="cortex_instance_endpoint=https://aps-workspaces.us-east-2.amazonaws.com/workspaces/ws-1de68e95-0680-42bb-8e55-67e7fd5d0861" -var="testing_ami=${{ matrix.testing_ami }}" -var="aoc_version=${{ needs.e2etest-preparation.outputs.version }}" -var="testcase=../testcases/${{ matrix.testcase }}"
+              terraform destroy -auto-approve && exit 1
+            fi
 
       #This is here just in case workflow cancel
       - name: Destroy resources
@@ -712,8 +717,12 @@ jobs:
             if [[ -f testing-framework/terraform/testcases/${{ matrix.testcase }}/parameters.tfvars ]] ; then opts="-var-file=../testcases/${{ matrix.testcase }}/parameters.tfvars" ; else opts="" ; fi
             cd testing-framework/terraform/ec2
             terraform init
-            if terraform apply -auto-approve -lock=false $opts -var="region=us-east-1" -var="cortex_instance_endpoint=https://aps-workspaces.us-east-1.amazonaws.com/workspaces/ws-482cafe5-8d66-4099-8cb3-de5f0e6855d6" -var="testing_ami=${{ matrix.testing_ami }}" -var="aoc_version=${{ needs.e2etest-preparation.outputs.version }}" -var="testcase=../testcases/${{ matrix.testcase }}" ; then terraform destroy -auto-approve ; else terraform destroy -auto-approve && exit 1 ; fi
-
+            if terraform apply -auto-approve -lock=false $opts -var="region=us-east-2" -var="cortex_instance_endpoint=https://aps-workspaces.us-east-2.amazonaws.com/workspaces/ws-1de68e95-0680-42bb-8e55-67e7fd5d0861" -var="testing_ami=${{ matrix.testing_ami }}" -var="aoc_version=${{ needs.e2etest-preparation.outputs.version }}" -var="testcase=../testcases/${{ matrix.testcase }}" ; then
+              terraform destroy -auto-approve
+            else
+              terraform apply -auto-approve -lock=false $opts -var="region=us-east-2" -var="cortex_instance_endpoint=https://aps-workspaces.us-east-2.amazonaws.com/workspaces/ws-1de68e95-0680-42bb-8e55-67e7fd5d0861" -var="testing_ami=${{ matrix.testing_ami }}" -var="aoc_version=${{ needs.e2etest-preparation.outputs.version }}" -var="testcase=../testcases/${{ matrix.testcase }}"
+              terraform destroy -auto-approve && exit 1
+            fi
       #This is here just in case workflow cancel
       - name: Destroy resources
         if: ${{ cancelled() && steps.e2etest-ec2-2.outputs.cache-hit != 'true' }}
@@ -782,8 +791,12 @@ jobs:
             if [[ -f testing-framework/terraform/testcases/${{ matrix.testcase }}/parameters.tfvars ]] ; then opts="-var-file=../testcases/${{ matrix.testcase }}/parameters.tfvars" ; else opts="" ; fi
             cd testing-framework/terraform/ec2
             terraform init
-            if terraform apply -auto-approve -lock=false $opts -var="region=us-east-1" -var="cortex_instance_endpoint=https://aps-workspaces.us-east-1.amazonaws.com/workspaces/ws-482cafe5-8d66-4099-8cb3-de5f0e6855d6"  -var="testing_ami=${{ matrix.testing_ami }}" -var="aoc_version=${{ needs.e2etest-preparation.outputs.version }}" -var="testcase=../testcases/${{ matrix.testcase }}" ; then terraform destroy -auto-approve ; else terraform destroy -auto-approve && exit 1 ; fi
-
+            if terraform apply -auto-approve -lock=false $opts -var="region=us-east-2" -var="cortex_instance_endpoint=https://aps-workspaces.us-east-2.amazonaws.com/workspaces/ws-1de68e95-0680-42bb-8e55-67e7fd5d0861" -var="testing_ami=${{ matrix.testing_ami }}" -var="aoc_version=${{ needs.e2etest-preparation.outputs.version }}" -var="testcase=../testcases/${{ matrix.testcase }}" ; then
+              terraform destroy -auto-approve
+            else
+              terraform apply -auto-approve -lock=false $opts -var="region=us-east-2" -var="cortex_instance_endpoint=https://aps-workspaces.us-east-2.amazonaws.com/workspaces/ws-1de68e95-0680-42bb-8e55-67e7fd5d0861" -var="testing_ami=${{ matrix.testing_ami }}" -var="aoc_version=${{ needs.e2etest-preparation.outputs.version }}" -var="testcase=../testcases/${{ matrix.testcase }}"
+              terraform destroy -auto-approve && exit 1
+            fi
       #This is here just in case workflow cancel
       - name: Destroy resources
         if: ${{ cancelled() && steps.e2etest-ec2-3.outputs.cache-hit != 'true' }}
