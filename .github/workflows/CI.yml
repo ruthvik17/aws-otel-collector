@@ -534,7 +534,7 @@ jobs:
 
   get-testing-suites:
     runs-on: ubuntu-latest
-    if: github.event_name == 'push' && contains(github.ref,'refs/heads/test/')
+    if: github.event_name == 'push' && !contains(github.ref_name,'test/')
     outputs:
       eks-matrix: ${{ steps.set-matrix.outputs.eks-matrix }}
       eks-arm64-matrix: ${{ steps.set-matrix.outputs.eks-arm64-matrix }}
