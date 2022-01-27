@@ -19,10 +19,7 @@ on:
       - release/v*
       - dev
       - test/*
-    paths-ignore:
-      - '.github/**'
-      - '!.github/workflows/CI.yml'
-      - '**.md'
+
 
   # from collector and contrib repo
   repository_dispatch:
