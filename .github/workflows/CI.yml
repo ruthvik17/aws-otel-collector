@@ -20,7 +20,6 @@ on:
       - dev
       - test/*
 
-
   # from collector and contrib repo
   repository_dispatch:
     types: [dependency-build, workflow-run]
@@ -634,16 +633,16 @@ jobs:
         uses: nick-invision/retry@v2
         with:
           max_attempts: 3
-          timeout_minutes: 120
+          timeout_minutes: 30
           command: |
             opts=""
             if [[ -f testing-framework/terraform/testcases/${{ matrix.testcase }}/parameters.tfvars ]] ; then opts="-var-file=../testcases/${{ matrix.testcase }}/parameters.tfvars" ; fi
             cd testing-framework/terraform/ec2
             terraform init
             if terraform apply -auto-approve -lock=false $opts -var="testing_ami=${{ matrix.testing_ami }}" -var="aoc_version=${{ needs.e2etest-preparation.outputs.version }}" -var="testcase=../testcases/${{ matrix.testcase }}" ; then
-              if ! terraform destroy -auto-approve; then exit 1; fi
+              terraform destroy -auto-approve
             else
-              if ! terraform destroy -auto-approve; then exit 1; fi && exit 1
+              terraform destroy -auto-approve && exit 1
             fi
 
       #This is here just in case workflow cancel
@@ -652,7 +651,8 @@ jobs:
         uses: nick-invision/retry@v2
         with:
           max_attempts: 3
-          timeout_minutes: 30
+          timeout_minutes: 8
+          retry_wait_seconds: 20
           command: cd testing-framework/terraform/ec2 && terraform destroy -auto-approve
 
   e2etest-ec2-2:
@@ -712,13 +712,17 @@ jobs:
         uses: nick-invision/retry@v2
         with:
           max_attempts: 3
-          timeout_minutes: 120
+          timeout_minutes: 25
           command: |
             opts=""
             if [[ -f testing-framework/terraform/testcases/${{ matrix.testcase }}/parameters.tfvars ]] ; then opts="-var-file=../testcases/${{ matrix.testcase }}/parameters.tfvars" ; fi
             cd testing-framework/terraform/ec2
             terraform init
-            if terraform apply -auto-approve -lock=false $opts -var="testing_ami=${{ matrix.testing_ami }}" -var="aoc_version=${{ needs.e2etest-preparation.outputs.version }}" -var="testcase=../testcases/${{ matrix.testcase }}" ; then terraform destroy -auto-approve ; else terraform destroy -auto-approve && exit 1 ; fi
+            if terraform apply -auto-approve -lock=false $opts -var="testing_ami=${{ matrix.testing_ami }}" -var="aoc_version=${{ needs.e2etest-preparation.outputs.version }}" -var="testcase=../testcases/${{ matrix.testcase }}" ; then
+              terraform destroy -auto-approve
+            else
+              terraform destroy -auto-approve && exit 1
+            fi
 
       #This is here just in case workflow cancel
       - name: Destroy resources
@@ -726,7 +730,8 @@ jobs:
         uses: nick-invision/retry@v2
         with:
           max_attempts: 3
-          timeout_minutes: 30
+          timeout_minutes: 8
+          retry_wait_seconds: 20
           command: cd testing-framework/terraform/ec2 && terraform destroy -auto-approve
 
   e2etest-ec2-3:
@@ -786,16 +791,16 @@ jobs:
         uses: nick-invision/retry@v2
         with:
           max_attempts: 3
-          timeout_minutes: 120
+          timeout_minutes: 25
           command: |
             opts=""
             if [[ -f testing-framework/terraform/testcases/${{ matrix.testcase }}/parameters.tfvars ]] ; then opts="-var-file=../testcases/${{ matrix.testcase }}/parameters.tfvars" ; fi
             cd testing-framework/terraform/ec2
             terraform init
             if terraform apply -auto-approve -lock=false $opts -var="testing_ami=${{ matrix.testing_ami }}" -var="aoc_version=${{ needs.e2etest-preparation.outputs.version }}" -var="testcase=../testcases/${{ matrix.testcase }}" ; then
-              if ! terraform destroy -auto-approve; then exit 1; fi
+              terraform destroy -auto-approve
             else
-              if ! terraform destroy -auto-approve; then exit 1; fi && exit 1
+              terraform destroy -auto-approve && exit 1
             fi
 
       #This is here just in case workflow cancel
@@ -804,7 +809,8 @@ jobs:
         uses: nick-invision/retry@v2
         with:
           max_attempts: 3
-          timeout_minutes: 30
+          timeout_minutes: 8
+          retry_wait_seconds: 20
           command: cd testing-framework/terraform/ec2 && terraform destroy -auto-approve
 
   e2etest-ecs:
@@ -857,16 +863,16 @@ jobs:
         uses: nick-invision/retry@v2
         with:
           max_attempts: 3
-          timeout_minutes: 120
+          timeout_minutes: 25
           command: |
             opts=""
             if [[ -f testing-framework/terraform/testcases/${{ matrix.testcase }}/parameters.tfvars ]] ; then opts="-var-file=../testcases/${{ matrix.testcase }}/parameters.tfvars"; fi
             cd testing-framework/terraform/ecs
             terraform init
             if terraform apply -auto-approve -lock=false $opts -var="ecs_launch_type=${{ matrix.launch_type }}" -var="aoc_version=${{ needs.e2etest-preparation.outputs.version }}" -var="testcase=../testcases/${{ matrix.testcase }}" ; then
-              if ! terraform destroy -auto-approve; then exit 1; fi
+              terraform destroy -auto-approve
             else
-              if ! terraform destroy -auto-approve; then exit 1; fi && exit 1
+              terraform destroy -auto-approve && exit 1
             fi
 
       #This is here just in case workflow cancel
@@ -875,7 +881,8 @@ jobs:
         uses: nick-invision/retry@v2
         with:
           max_attempts: 3
-          timeout_minutes: 30
+          timeout_minutes: 25
+          retry_wait_seconds: 20
           command: cd testing-framework/terraform/ecs && terraform destroy -auto-approve
 
   e2etest-eks:
@@ -935,8 +942,11 @@ jobs:
         uses: nick-invision/retry@v2
         with:
           max_attempts: 3
-          timeout_minutes: 30
-          command: cd testing-framework/terraform/eks && terraform destroy -auto-approve
+          timeout_minutes: 8
+          retry_wait_seconds: 20
+          command: |
+            cd testing-framework/terraform/eks 
+            if terraform destroy -auto-approve; then exit 0; fi
 
   e2etest-eks-arm64:
     runs-on: ubuntu-latest
@@ -995,7 +1005,8 @@ jobs:
         uses: nick-invision/retry@v2
         with:
           max_attempts: 3
-          timeout_minutes: 30
+          timeout_minutes: 8
+          retry_wait_seconds: 20
           command: cd testing-framework/terraform/eks && terraform destroy -auto-approve -var="region=us-east-2" -var="eks_cluster_name=integ-test-arm64-cluster"
 
 
@@ -1049,16 +1060,16 @@ jobs:
         uses: nick-invision/retry@v2
         with:
           max_attempts: 3
-          timeout_minutes: 120
+          timeout_minutes: 25
           command: |
             opts=""
             if [[ -f testing-framework/terraform/testcases/${{ matrix.testcase }}/parameters.tfvars ]] ; then opts="-var-file=../testcases/${{ matrix.testcase }}/parameters.tfvars" ; fi
             cd testing-framework/terraform/eks
             terraform init
             if terraform apply -auto-approve -lock=false $opts -var="aoc_version=${{ needs.e2etest-preparation.outputs.version }}" -var="testcase=../testcases/${{ matrix.testcase }}" ; then
-              if ! terraform destroy -auto-approve -var-file="../testcases/${{ matrix.testcase }}/parameters.tfvars"; then exit 1; fi
+              terraform destroy -auto-approve $opts
             else
-              if ! terraform destroy -auto-approve -var-file="../testcases/${{ matrix.testcase }}/parameters.tfvars"; then exit 1; fi && exit 1
+              terraform destroy -auto-approve $opts && exit 1
             fi
 
       #This is here just in case workflow cancel
@@ -1067,8 +1078,12 @@ jobs:
         uses: nick-invision/retry@v2
         with:
           max_attempts: 3
-          timeout_minutes: 30
-          command: cd testing-framework/terraform/eks && terraform destroy -auto-approve
+          timeout_minutes: 8
+          retry_wait_seconds: 20
+          command: |
+            opts=""
+            if [[ -f testing-framework/terraform/testcases/${{ matrix.testcase }}/parameters.tfvars ]] ; then opts="-var-file=../testcases/${{ matrix.testcase }}/parameters.tfvars" ; fi
+            cd testing-framework/terraform/eks && terraform destroy -auto-approve $opts
 
   e2etest-eks-adot-operator:
     runs-on: ubuntu-latest
@@ -1127,12 +1142,17 @@ jobs:
         uses: nick-invision/retry@v2
         with:
           max_attempts: 3
-          timeout_minutes: 30
-          command: cd testing-framework/terraform/eks && terraform destroy -auto-approve -var-file="../testcases/${{ matrix.testcase }}/parameters.tfvars"
+          timeout_minutes: 8
+          retry_wait_seconds: 20
+          command: |
+            opts=""
+            if [[ -f testing-framework/terraform/testcases/${{ matrix.testcase }}/parameters.tfvars ]] ; then opts="-var-file=../testcases/${{ matrix.testcase }}/parameters.tfvars" ; fi
+            cd testing-framework/terraform/eks && terraform destroy -auto-approve $opts
+
 
   release-candidate:
     runs-on: ubuntu-latest
-    if: github.event_name == 'push' # only create the artifact when there's a push, not for dispatch.
+    if: github.event_name == 'push' && !contains(github.ref_name,'test/') # only create the artifact when there's a push, not for dispatch.
     needs: [e2etest-eks, e2etest-eks-arm64, e2etest-eks-adot-operator, e2etest-eks-fargate, e2etest-ecs, e2etest-ec2-1, e2etest-ec2-2, e2etest-ec2-3]
     steps:
       - name: Configure AWS Credentials
