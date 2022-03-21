@@ -56,9 +56,9 @@ jobs:
 
 
   run-terraform-test:
-      runs-on: ubuntu-latest  
+      runs-on: ubuntu-latest
+      needs: [create-test-ref, build-aotutil]
       steps:
-        - uses: actions/checkout@v3
 
         - name: Configure AWS Credentials
           uses: aws-actions/configure-aws-credentials@v1
