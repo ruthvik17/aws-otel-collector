@@ -112,4 +112,3 @@ jobs:
             command: |
               cd testing-framework/terraform/eks_adot_operator_cluster_setup 
               terraform destroy -auto-approve -lock=false -var="region=us-west-2"
-              
