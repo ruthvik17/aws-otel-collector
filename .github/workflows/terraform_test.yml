@@ -4,10 +4,7 @@ on:
   push:
     branches:
       - terraform_test
-    paths-ignore:
-      - '.github/**'
-      - '!.github/workflows/CI.yml'
-      - '**.md'
+
 
 
 env:
