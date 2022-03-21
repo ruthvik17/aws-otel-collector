@@ -98,8 +98,9 @@ jobs:
             max_attempts: 3
             timeout_minutes: 60
             command: |
-              cd testing-framework/terraform/eks_adot_operator_cluster_setup && terraform init
-              terraform apply 
+              cd testing-framework/terraform/eks_adot_operator_cluster_setup 
+              terraform init
+              terraform apply -auto-approve -lock=false
 
         - name: Destroy resources
           if: ${{ cancelled() }}
@@ -108,4 +109,6 @@ jobs:
             max_attempts: 3
             timeout_minutes: 8
             retry_wait_seconds: 20
-            command: cd testing-framework/terraform/eks_adot_operator_cluster_setup && terraform destroy -auto-approve -var="region=us-west-2"
+            command: |
+              cd testing-framework/terraform/eks_adot_operator_cluster_setup 
+              terraform destroy -auto-approve -lock=false -var="region=us-west-2"
