@@ -12,6 +12,7 @@ env:
   TF_VAR_patch: 'true'
   TESTING_FRAMEWORK_REPO: aws-observability/aws-otel-test-framework
 
+
 jobs:
   create-test-ref:
     runs-on: ubuntu-latest
