@@ -100,7 +100,12 @@ jobs:
             command: |
               cd testing-framework/terraform/eks_adot_operator_cluster_setup 
               terraform init
-              terraform apply -auto-approve -lock=false -var="region=us-east-2"
+              if terraform apply -auto-approve -lock=false -var="region=us-east-2"  ; then
+                terraform destroy -auto-approve -var="region=us-east-2"
+              else
+                terraform destroy -auto-approve -var="region=us-east-2" && exit 1 
+              fi
+
 
         - name: Destroy resources
           if: ${{ cancelled() }}
