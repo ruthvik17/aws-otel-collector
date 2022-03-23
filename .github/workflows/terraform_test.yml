@@ -4,8 +4,7 @@ on:
   push:
     branches:
       - terraform_test
-      
-      
+       
 
 env:
   TF_VAR_aws_access_key_id: ${{ secrets.AWS_KEY_ID }}
