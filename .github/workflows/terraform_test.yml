@@ -108,7 +108,7 @@ jobs:
 
 
         - name: Destroy resources
-          if: ${{ cancelled() }}
+          if: ${{ always() }}
           uses: nick-invision/retry@v2
           with:
             max_attempts: 3
