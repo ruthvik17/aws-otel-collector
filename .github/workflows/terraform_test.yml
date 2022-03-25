@@ -101,8 +101,6 @@ jobs:
               cd testing-framework/terraform/eks_adot_operator_cluster_setup 
               terraform init
               terraform apply -auto-approve -lock=false -var="region=us-east-1"
-              fi
-
 
         - name: Destroy resources
           if: ${{ always() }}
