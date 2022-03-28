@@ -121,10 +121,10 @@ jobs:
             command: |
               cd testing-framework/terraform/eks_adot_operator_cluster_setup 
               
-              if terraform apply -auto-approve -lock=false; then
-              terraform destroy -auto-approve
+              if terraform apply -auto-approve -lock=false -var="region=us-east-1"; then
+              terraform destroy -auto-approve -var="region=us-east-1"
               else
-              terraform destroy -auto-approve && exit 1
+              terraform destroy -auto-approve -var="region=us-east-1" && exit 1
               fi
     
         - name: Destroy resources
