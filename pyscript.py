@@ -1,9 +1,11 @@
 import json
+import sys
 
 # the file to be converted to 
 # json format
-filename = 'test.txt'
-  
+args = sys.argv
+filename = str(args[1])
+
 # dictionary where the lines from
 # text will be stored
 dict1 = {}
