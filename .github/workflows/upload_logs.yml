@@ -12,6 +12,7 @@ env:
   TESTING_FRAMEWORK_REPO: aws-observability/aws-otel-test-framework
   GITHUB_RUN_ID: ${{ github.run_id }}
   SCRIPT_REPO: ruthvik17/aws-otel-collector
+  ARTIFACT_DIR: /home/runner/work/aws-otel-collector/aws-otel-collector
 
 jobs:
   create-test-ref:
@@ -146,7 +147,7 @@ jobs:
           name: logs
           path: test.txt
      
-      - name: Check-out devops repository
+      - name: Check-out collector repository
         uses: actions/checkout@v2
         with:
           repository: ruthvik17/aws-otel-collector
@@ -154,7 +155,7 @@ jobs:
           path: ${{ env.SCRIPT_REPO }}
 
       - name: Hello World
-        run: python ${{ env.SCRIPT_REPO }}/pyscript.py
+        run: python ${{ env.SCRIPT_REPO }}/pyscript.py ${{ env.ARTIFACT_DIR}}/text.txt
         shell: sh
         
       - name: Upload artifact
