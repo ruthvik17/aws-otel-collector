@@ -152,9 +152,8 @@ jobs:
           name: logs
       - shell: bash
         run: |
-          value=`cat test.txt`
-          value > test.txt
-     
+          cat test.txt > ruthvik17/aws-otel-collector/test.txt
+      
       - name: Check-out collector repository
         uses: actions/checkout@v2
         with:
@@ -163,7 +162,7 @@ jobs:
           path: ${{ env.SCRIPT_REPO }}
 
       - name: Hello World
-        run: python ${{ env.SCRIPT_REPO }}/pyscript.py test.txt
+        run: python ${{ env.SCRIPT_REPO }}/pyscript.py {{ env.SCRIPT_REPO}}/test.txt
         shell: sh
         
       - name: Upload artifact
