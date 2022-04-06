@@ -150,7 +150,10 @@ jobs:
         uses: actions/download-artifact@v3
         with:
           name: logs
-          path: ${{env.SCRIPT_REPO }}/test.txt
+      - shell: bash
+        run: |
+          value=`cat test.txt`
+          value > test.txt
      
       - name: Check-out collector repository
         uses: actions/checkout@v2
@@ -160,7 +163,7 @@ jobs:
           path: ${{ env.SCRIPT_REPO }}
 
       - name: Hello World
-        run: python ${{ env.SCRIPT_REPO }}/pyscript.py ${{ env.ARTIFACT_DIR }}/${{ env.SCRIPT_REPO }}/test.txt
+        run: python ${{ env.SCRIPT_REPO }}/pyscript.py test.txt
         shell: sh
         
       - name: Upload artifact
