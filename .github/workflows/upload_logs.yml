@@ -152,7 +152,7 @@ jobs:
           name: logs
       - shell: bash
         run: |
-          cat test.txt > ruthvik17/aws-otel-collector/test.txt
+          cat test.txt > test.txt
       
       - name: Check-out collector repository
         uses: actions/checkout@v2
