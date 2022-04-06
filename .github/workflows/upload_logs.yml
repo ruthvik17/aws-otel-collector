@@ -126,6 +126,11 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           GITHUB_REPO: ruthvik17/aws-otel-collector
           
+      - run: cat test.txt
+        env:   
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GITHUB_REPO: ruthvik17/aws-otel-collector
+          
       - name: Upload artifact
         uses: actions/upload-artifact@v1
         with:
