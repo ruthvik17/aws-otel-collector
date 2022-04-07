@@ -49,49 +49,11 @@ with open(filename) as fh:
         # print(dict1)
         line_no += 1
 
-        out_file = open("test_json_py.json", "a")
-        index_dict = json.dumps(dict1, indent = 0)
-        out_file.write(index_dict)
-        out_file.write("\n")
-        log_dict = json.dumps(dict2, indent = 0)
-        out_file.write(log_dict)
-        out_file.write("\n")
-        out_file.close()
 
-        if line_no > 7:
-            break
-        # p += 1
+        data = [ dict1, dict2]
 
-        # if p > 5:
-        #     break
-# print(type(dict1))
-# print([dict1.keys()][:5])
-# creating json file
-# the JSON file is named as test1
-# out_file = open("test_json.json", "a")
-# out_file.write("\n")
-# out_file.close()
-# from opensearchpy import OpenSearch, RequestsHttpConnection, AWSV4SignerAuth
-# import boto3
 
-# host = 'https://search-gh-actions-test-toozusakad3jibpfljps5rvmdm.us-west-2.es.amazonaws.com' # cluster endpoint, for example: my-test-domain.us-east-1.es.amazonaws.com
-# region = 'us-west-2' # e.g. us-west-1
-
-# credentials = boto3.Session().get_credentials()
-# auth = AWSV4SignerAuth(credentials, region)
-
-# client = OpenSearch(
-#     hosts = [{'host': host, 'port': 443}],
-#     http_auth = auth,
-#     use_ssl = True,
-#     verify_certs = True,
-#     connection_class = RequestsHttpConnection
-# )
-# id = '1'
-# for key, log in dict1.items():
-#     response = client.index(
-#     index = key,
-#     body = log,
-#     )
-#     id = str(int(id) + 1)
+        with open('test_json_py.json', 'a') as fp:
+            fp.write(
+            '\n'.join(json.dumps(i) for i in data) + '\n')
 
