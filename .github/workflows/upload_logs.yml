@@ -154,7 +154,7 @@ jobs:
           run: |
             curl -XPOST -u 'ruthvik:Ruthvik-19' \
             'https://search-gh-test-mn2dq77arhyercpvg3sgdihpnq.us-west-2.es.amazonaws.com/_bulk' \
-            --data-binary @test_json.json -H 'Content-Type: application/json'
+            --data-binary @test_json_py.json -H 'Content-Type: application/json'
       
         
 #   upload-logs:
