@@ -149,7 +149,8 @@ jobs:
             aws-secret-access-key: ${{ secrets.AWS_KEY_SECRET }}
             aws-region: us-west-2
        
-        - name: Push to OpenSearch    
+        - name: Push to OpenSearch 
+          if: ${{ always() }}
           run: |
             curl -XPOST -u 'ruthvik:Ruthvik-19' \
             'https://search-gh-test-mn2dq77arhyercpvg3sgdihpnq.us-west-2.es.amazonaws.com/_bulk' \
