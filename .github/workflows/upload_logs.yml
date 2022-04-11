@@ -117,7 +117,7 @@ jobs:
               
         - name: Get logs
           if: ${{ always() }}
-          run: gh run view ${{ github.job_id }} --log | tee -a test.txt
+          run: gh run view ${{ github.run_id }} --job ${{ github.job_id}} --log | tee -a test.txt
           env:
             GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
             GITHUB_REPO: ruthvik17/aws-otel-collector   
