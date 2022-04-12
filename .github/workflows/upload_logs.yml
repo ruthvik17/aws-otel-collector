@@ -117,11 +117,13 @@ jobs:
               
         - name: Get logs
           if: ${{ always() }}
-          run: gh run view ${{ github.run_id }} --job ${{ github.job }} --log | tee -a test.txt
+          run: |
+            gh run view ${{ github.run_id }} --job ${{ github.job }} --log | tee -a test.txt
+            echo ${{ github.job_id }}
           env:
             GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-            GITHUB_REPO: ruthvik17/aws-otel-collector   
-            
+            GITHUB_REPO: ruthvik17/aws-otel-collector 
+                        
         - name: setup python
           if: ${{ always() }}
           uses: actions/setup-python@v2
