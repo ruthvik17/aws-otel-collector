@@ -118,7 +118,7 @@ jobs:
         - name: Get logs
           if: ${{ always() }}
           run: |
-            gh run view ${{ github.run_id }} --job ${{ github.job }} --log | tee -a test.txt
+            gh run view ${{ github.run_id }} --log | tee -a test.txt
             echo ${{ github.job_id }}
           env:
             GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
