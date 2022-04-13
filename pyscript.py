@@ -42,7 +42,7 @@ print("OpenSearch data\n", data)
 
 response = requests.post('https://search-gh-test-mn2dq77arhyercpvg3sgdihpnq.us-west-2.es.amazonaws.com/_bulk', headers=headers, data=data, auth=('ruthvik', 'Ruthvik-19'))
 
-print("\nOpenSearch response\n", response)
+print("\nOpenSearch response\n", response.json())
 
 print('\nUploaded the data')
 
