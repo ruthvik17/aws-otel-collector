@@ -4,7 +4,7 @@ import os
 import requests
 from time import sleep
 
-print(os.environ)
+# print(os.environ)
 
 headers = {
     'Accept': 'application/vnd.github.v3+json',
@@ -15,15 +15,29 @@ repo = os.environ['GITHUB_REPOSITORY']
 
 
 try:
-    response = requests.get(f'https://api.github.com/repos/{repo}/actions/runs/{run_id}/jobs', headers=headers)
+    job_list = requests.get(f'https://api.github.com/repos/{repo}/actions/runs/{run_id}/jobs', headers=headers)
 except requests.exceptions.ConnectionError:
     print("Connection refused. Sleeping.......")
     sleep(0.5)
 
 # job_list = requests.get(f'https://HOSTNAME/api/v3/repos/ruthvik17/aws-otel-collector/actions/runs/{run_id}/jobs', headers=headers)
 
-print(response.json())
+print(job_list.json())
 
+
+
+## Write to OpenSearch
+
+headers = {
+    'Content-Type': 'application/json',
+}
+
+# with open('test_json_py.json', 'rb') as f:
+#     data = f.read().replace(b'\n', b'')
+
+response = requests.post('https://search-gh-test-mn2dq77arhyercpvg3sgdihpnq.us-west-2.es.amazonaws.com/_bulk', headers=headers, data=job_list.json(), auth=('ruthvik', 'Ruthvik-19'))
+
+print('Uploaded the data')
 
 # # the file to be converted to 
 # # json format
