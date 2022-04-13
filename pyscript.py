@@ -27,9 +27,7 @@ except requests.exceptions.ConnectionError:
 job_data = job_list.json()
 
 with open('test_json_py.json', 'a') as fp:
-            fp.write(
-            '\n'.join(json.dumps(i) for i in job_data) + '\n')
-
+            fp.write(json.dumps(job_data))
 
 ## Write to OpenSearch
 
