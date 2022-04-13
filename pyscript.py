@@ -1,8 +1,7 @@
 import json
 import sys
-import requests
-
 import os
+import requests
 
 print(os.environ)
 
@@ -10,9 +9,9 @@ headers = {
     'Accept': 'application/vnd.github.v3+json',
 }
 
-response = requests.get('https://HOSTNAME/api/v3/repos/ruthvik17/aws-otel-collector/actions/runs/${{ github.run_id }}/jobs', headers=headers)
+job_list = requests.get('https://HOSTNAME/api/v3/repos/ruthvik17/aws-otel-collector/actions/runs/os.environ['GITHUB_RUN_ID']/jobs', headers=headers)
 
-print(response)
+print(job_list)
 
 # the file to be converted to 
 # json format
