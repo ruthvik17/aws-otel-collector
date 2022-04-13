@@ -9,7 +9,9 @@ headers = {
     'Accept': 'application/vnd.github.v3+json',
 }
 
-job_list = requests.get('https://HOSTNAME/api/v3/repos/ruthvik17/aws-otel-collector/actions/runs/os.environ['GITHUB_RUN_ID']/jobs', headers=headers)
+run_id = os.environ['GITHUB_RUN_ID']
+
+job_list = requests.get(f'https://HOSTNAME/api/v3/repos/ruthvik17/aws-otel-collector/actions/runs/{run_id}/jobs', headers=headers)
 
 print(job_list)
 
