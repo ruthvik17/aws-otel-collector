@@ -114,16 +114,7 @@ jobs:
             command: |
               cd testing-framework/terraform/eks_adot_operator_cluster_setup 
               terraform destroy -auto-approve -lock=false -var="region=us-east-1"
-              
-        - name: Get logs
-          if: ${{ always() }}
-          run: |
-            gh run view ${{ github.run_id }} --log | tee -a test.txt
-            echo ${{ github.job_id }}
-          env:
-            GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-            GITHUB_REPO: ruthvik17/aws-otel-collector 
-                        
+        
         - name: setup python
           if: ${{ always() }}
           uses: actions/setup-python@v2
@@ -145,6 +136,10 @@ jobs:
         - name: Run pyscript
           if: ${{ always() }}
           run: python ${{ env.SCRIPT_REPO }}/pyscript.py
+          env:
+            GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+            GITHUB_REPO: ruthvik17/aws-otel-collector 
+
           shell: sh
 
 #         - name: Push to OpenSearch 
