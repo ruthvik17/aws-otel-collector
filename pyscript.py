@@ -16,11 +16,12 @@ run_id = os.environ['GITHUB_RUN_ID']
 try:
     job_list = requests.get(f'https://HOSTNAME/api/v3/repos/ruthvik17/aws-otel-collector/actions/runs/{run_id}/jobs', headers=headers)
 except requests.exceptions.ConnectionError:
-    sleep(500)
+    sleep(5)
 
 # job_list = requests.get(f'https://HOSTNAME/api/v3/repos/ruthvik17/aws-otel-collector/actions/runs/{run_id}/jobs', headers=headers)
 
 print(job_list)
+
 # the file to be converted to 
 # json format
 args = sys.argv
