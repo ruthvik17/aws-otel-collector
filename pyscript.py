@@ -26,6 +26,22 @@ except requests.exceptions.ConnectionError:
 
 job_data = job_list.json()
 
+#Get Job Id
+job_id = job_data['jobs'][0]['id']
+
+headers = {
+    'Accept': 'application/vnd.github.v3+json',
+}
+
+try:
+    job_logs= requests.get(f'https://api.github.com/repos/{repo}/actions/jobs/{job_id}/logs', headers=headers)
+except requests.exceptions.ConnectionError:
+    print("Connection refused. Sleeping.......")
+    sleep(0.5)
+    
+    
+print('Job logs \n', job_logs.json())
+
 with open('test_json_py.json', 'a') as fp:
      fp.write(json.dumps(job_data) + '\n')
 
@@ -38,13 +54,16 @@ headers = {
 with open('test_json_py.json', 'rb') as f:
     data = f.read().replace(b'\n', b'')
 
-print("OpenSearch data\n", data)
+print("\nOpenSearch data\n", data)
 
-response = requests.post('https://search-gh-test-mn2dq77arhyercpvg3sgdihpnq.us-west-2.es.amazonaws.com/_bulk', headers=headers, data=data, auth=('ruthvik', 'Ruthvik-19'))
-
+try:
+    response = requests.post('https://search-gh-test-mn2dq77arhyercpvg3sgdihpnq.us-west-2.es.amazonaws.com/_bulk', headers=headers, data=data, auth=('ruthvik', 'Ruthvik-19'))
+except requests.exceptions.ConnectionError:
+    print('\nConnection error')
+    
 print("\nOpenSearch response\n", response.json())
 
-print('\nUploaded the data')
+
 
 # # the file to be converted to 
 # # json format
