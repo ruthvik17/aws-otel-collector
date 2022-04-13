@@ -24,11 +24,11 @@ except requests.exceptions.ConnectionError:
 
 # print(job_list.json())
 
-data = job_list.json()
+job_data = job_list.json()
 
 with open('test_json_py.json', 'a') as fp:
             fp.write(
-            '\n'.join(json.dumps(i) for i in data) + '\n')
+            '\n'.join(json.dumps(i) for i in job_data) + '\n')
 
 
 ## Write to OpenSearch
@@ -40,9 +40,13 @@ headers = {
 with open('test_json_py.json', 'rb') as f:
     data = f.read().replace(b'\n', b'')
 
+print("OpenSearch data\n", data)
+
 response = requests.post('https://search-gh-test-mn2dq77arhyercpvg3sgdihpnq.us-west-2.es.amazonaws.com/_bulk', headers=headers, data=data, auth=('ruthvik', 'Ruthvik-19'))
 
-print('Uploaded the data')
+print("\nOpenSearch response\n", response)
+
+print('\nUploaded the data')
 
 # # the file to be converted to 
 # # json format
