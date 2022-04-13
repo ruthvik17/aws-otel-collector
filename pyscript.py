@@ -13,7 +13,7 @@ headers = {
 run_id = os.environ['GITHUB_RUN_ID']
 
 try:
-    response = requests.get(f'https://github.com/api/v3/repos/ruthvik17/aws-otel-collector/actions/runs/{run_id}/jobs', headers=headers)
+    response = requests.get(f'https://api.github.com/repos/ruthvik17/aws-otel-collector/actions/runs/{run_id}/jobs', headers=headers)
 except requests.exceptions.ConnectionError:
     print("Connection refused. Sleeping.......")
     sleep(0.5)
