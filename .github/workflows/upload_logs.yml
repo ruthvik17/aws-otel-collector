@@ -140,7 +140,7 @@ jobs:
             
         - name: Install requests
           if: ${{ always() }}
-          command: python -m pip install requests
+          run: python -m pip install requests
           
         - name: Run pyscript
           if: ${{ always() }}
