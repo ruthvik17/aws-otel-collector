@@ -29,8 +29,11 @@ job_data = job_list.json()
 #Get Job Id
 job_id = job_data['jobs'][0]['id']
 
+acess_token = os.environ['PAT_ACCESS']
+
 headers = {
     'Accept': 'application/vnd.github.v3+json',
+    'Authorization': access_token
 }
 
 try:
