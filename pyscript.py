@@ -10,10 +10,10 @@ headers = {
     'Accept': 'application/vnd.github.v3+json',
 }
 
-# run_id = os.environ['GITHUB_RUN_ID']
+run_id = os.environ['GITHUB_RUN_ID']
 
 try:
-    job_list = requests.get('https://www.github.com/api/v3/repos/ruthvik17/aws-otel-collector/actions/runs/2158670100/jobs', headers=headers)
+    job_list = requests.get(f'https://www.github.com/api/v3/repos/ruthvik17/aws-otel-collector/actions/runs/{run_id}/jobs', headers=headers)
 except requests.exceptions.ConnectionError:
     print("Connection refused. Sleeping.......")
     sleep(0.5)
