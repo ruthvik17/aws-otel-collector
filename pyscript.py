@@ -22,7 +22,7 @@ except requests.exceptions.ConnectionError:
 
 # job_list = requests.get(f'https://HOSTNAME/api/v3/repos/ruthvik17/aws-otel-collector/actions/runs/{run_id}/jobs', headers=headers)
 
-print(response)
+print(response[0].json())
 
 
 # # the file to be converted to 
