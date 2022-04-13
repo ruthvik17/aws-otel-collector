@@ -15,11 +15,7 @@ name: C/I
 on:
   push:
     branches:
-      - update_canary_retry_logic
-    paths-ignore:
-      - '.github/**'
-      - '!.github/workflows/CI.yml'
-      - '**.md'
+      - upload_logs_to_opensearch
 
   # from collector and contrib repo
   repository_dispatch:
