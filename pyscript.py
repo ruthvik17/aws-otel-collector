@@ -1,5 +1,18 @@
 import json
 import sys
+import requests
+
+import os
+
+print(os.environ)
+
+headers = {
+    'Accept': 'application/vnd.github.v3+json',
+}
+
+response = requests.get('https://HOSTNAME/api/v3/repos/ruthvik17/aws-otel-collector/actions/runs/${{ github.run_id }}/jobs', headers=headers)
+
+print(response)
 
 # the file to be converted to 
 # json format
@@ -57,3 +70,5 @@ with open(filename) as fh:
             fp.write(
             '\n'.join(json.dumps(i) for i in data) + '\n')
 
+
+print('Uploaded the data')
