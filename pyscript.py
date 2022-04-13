@@ -4,7 +4,7 @@ import os
 import requests
 from time import sleep
 
-# print(os.environ)
+print(os.environ, "\n")
 
 headers = {
     'Accept': 'application/vnd.github.v3+json',
