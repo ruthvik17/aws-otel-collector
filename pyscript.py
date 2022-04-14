@@ -4,8 +4,6 @@ import os
 import requests
 from time import sleep
 
-print(os.environ, "\n")
-
 headers = {
     'Accept': 'application/vnd.github.v3+json',
 }
@@ -29,7 +27,7 @@ job_data = job_list.json()
 #Get Job Id
 job_id = job_data['jobs'][0]['id']
 
-access_token = os.environ['PAT_ACCESS']
+# Look at the work
 
 headers = {
     'Accept': 'application/vnd.github.v3+json',
@@ -42,92 +40,99 @@ except requests.exceptions.ConnectionError:
     print("Connection refused. Sleeping.......")
     sleep(0.5)
     
-    
-print('Job logs \n', job_logs.json())
+ try:
+    job_list = requests.get('https://api.github.com/repos/ruthvik17/aws-otel-collector/actions/runs/2168746686/jobs', headers=headers)
+except requests.exceptions.ConnectionError:
+    print("Connection refused. Sleeping.......")
+    sleep(0.5)
 
-with open('test_json_py.json', 'a') as fp:
-     fp.write(json.dumps(job_data) + '\n')
+job_data = job_list.json()
 
-## Write to OpenSearch
+print("\nTotal count of jobs", len(job_data["jobs"]))
+
+job_id = job_data["jobs"][0]["id"]
+
+keys = list(job_data["jobs"][0].keys())
+id_no = 0
+for job in job_data["jobs"]:
+    id_no += 1
+    dict1 = {}
+    for key in keys:
+        if key != 'steps':
+            dict1[f'job_{key}'] = job[key]
+        else:
+            for step in job[key]:
+                for info in list(step.keys()):
+                    dict1[f'{key}_{info}'] = step[info]
+
+    dict1["job_id"] = f"{id_no}"
+
+    dict2 = {"index" : { "_index": "workflow_data", "_id" : f"{id_no}" } }
+
+    dicts = [dict2, dict1]
+    with open('meta_json.json', 'a') as fp:
+        fp.write(
+        '\n'.join(json.dumps(dict) for dict in dicts) + '\n')
 
 headers = {
     'Content-Type': 'application/json',
 }
 
-with open('test_json_py.json', 'rb') as f:
-    data = f.read().replace(b'\n', b'')
+with open('meta_json.json', 'rb') as f:
+    data = f.read()
 
-print("\nOpenSearch data\n", data)
+response = requests.post('https://search-gh-test-mn2dq77arhyercpvg3sgdihpnq.us-west-2.es.amazonaws.com/_bulk', headers=headers, data=data, auth=('ruthvik', 'Ruthvik-19'))
 
-try:
-    response = requests.post('https://search-gh-test-mn2dq77arhyercpvg3sgdihpnq.us-west-2.es.amazonaws.com/_bulk', headers=headers, data=data, auth=('ruthvik', 'Ruthvik-19'))
-except requests.exceptions.ConnectionError:
-    print('\nConnection error')
-    
-print("\nOpenSearch response\n", response.json())
+print("OPensearch response \n ", response.json())
 
+print('\nUploaded to the data table')
 
+## Look at logs
 
-# # the file to be converted to 
-# # json format
-# args = sys.argv
-# filename = str(args[1])
+GITHUB_TOKEN = os.environ['PAT_ACCESS']
 
-# dictionary where the lines from
-# text will be stored
+headers = {
+    'Accept': 'application/vnd.github.v3+json',
+    'Authorization': f"token {GITHUB_TOKEN}",
+}   
 
+id_no = 0 
+for job in job_data["jobs"]:
+    dict1 = {}
+    job_id = job["id"]
+    id_no += 1
+    # print(job_id)
+    try:
+        job_log = requests.get(f'https://api.github.com/repos/ruthvik17/aws-otel-collector/actions/jobs/{job_id}/logs', headers=headers)
+    except requests.exceptions.ConnectionError:
+        print("Connection refused. Sleeping.......")
+        sleep(0.5)
 
+    dict1 = {}
+    dict1["job_id"] = job["id"]
+    dict1["run_id"] = job["run_id"]
+    dict1['job_run_attempt'] = job['run_attempt']
+    dict1['job_status'] = job['status']
+    dict1['job_conclusion'] = job['conclusion']
+    dict1['logs'] = f"{job_log.text}"
 
-# dictionary where the lines from
-# text will be stored
+    dict2 = {"index" : { "_index": "workflow_logs", "_id" : f"{id_no}" } }
 
+    dicts = [dict2, dict1]
 
-# fields in the sample file 
-# fields =['job_name', 'curent_job', 'log']
+    with open('meta_json_logs.json', 'a') as fp:
+        fp.write(
+        '\n'.join(json.dumps(dict) for dict in dicts) + '\n')
 
-# # p = 0
-# # creating dictionary
-# with open(filename) as fh:
-#     line_no = 1
-#     for line in fh:
-#         dict1 = {}
+headers = {
+    'Content-Type': 'application/json',
+}
 
-#         id_dict = { "_index": "logs", "_id" : str(line_no + 1) }
-#         dict1["index"] = id_dict
-        
-#         # reads each line and trims of  the extra spaces 
-#         # and gives only the valid words
-#         description = list( line.strip().split('\t', 3))
-#         # print(description)
-#         # loop variable
+with open('meta_json_logs.json', 'rb') as f:
+    data = f.read()
 
-#         if len(description) < len(fields):
-#             # dict2[line_no] = description
-#             # line_no += 1
-#             continue
-        
-#         i = 0
-#         # intermediate dictionary
-#         dict2 = {}
-#         while i<len(fields):
-              
-#                 # creating dictionary for each employee
-#                 dict2[fields[i]]= description[i]
-#                 i = i + 1
-                  
-#         # appending the record of each employee to
-#         # the main dictionary
-        
-#         # print(dict1)
-#         line_no += 1
+response = requests.post('https://search-gh-test-mn2dq77arhyercpvg3sgdihpnq.us-west-2.es.amazonaws.com/_bulk', headers=headers, data=data, auth=('ruthvik', 'Ruthvik-19'))
 
+print("OPensearch response \n ", response.json())
 
-#         data = [ dict1, dict2]
-
-
-#         with open('test_json_py.json', 'a') as fp:
-#             fp.write(
-#             '\n'.join(json.dumps(i) for i in data) + '\n')
-
-
-# print('Uploaded the data')
+print('\nUploaded to the logs table')
