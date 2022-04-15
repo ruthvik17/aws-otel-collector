@@ -44,6 +44,8 @@ for job in job_data["jobs"]:
             fp.write(
             '\n'.join(json.dumps(dict) for dict in dicts) + '\n')
 
+
+
 # Push to data table on OpenSearch
 headers = {
     'Content-Type': 'application/json',
@@ -53,7 +55,7 @@ with open('meta_json.json', 'rb') as f:
     data = f.read()
 
 response = requests.post('https://search-gh-test-mn2dq77arhyercpvg3sgdihpnq.us-west-2.es.amazonaws.com/_bulk', 
-                         headers=headers, data=data, auth=('ruthvik', 'Ruthvik-19'))
+                         headers=headers, data=data, auth=(os.environ['Test_user'], os.environ['Test_pass']))
 
 
 item_num = len(response.json()["items"])
