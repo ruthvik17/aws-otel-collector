@@ -27,24 +27,22 @@ id_no = 0
 
 # Loop through jobs data
 for job in job_data["jobs"]:
-    id_no += 1
     dict1 = {}
     for key in keys:
         if key != 'steps':
             dict1[f'job_{key}'] = job[key]
-        else:
-            for step in job[key]:
-                for info in list(step.keys()):
-                    dict1[f'{key}_{info}'] = step[info]
-
-    dict1["job_id"] = f"{id_no}"
-
-    dict2 = {"index" : { "_index": "workflow_data", "_id" : f"{id_no}" } }
-
-    dicts = [dict2, dict1]
-    with open('meta_json.json', 'a') as fp:
-        fp.write(
-        '\n'.join(json.dumps(dict) for dict in dicts) + '\n')
+    
+    for step in job['steps']:
+        for info in list(step.keys()):
+            dict1[f'{key}_{info}'] = step[info]
+            id_no += 1
+            dict1[f'steps_{info}'] = step[info]
+        dict2 = {"index" : { "_index": "workflow_data", "_id" : id_no } }
+        dicts = [dict2, dict1]
+        # Write to file
+        with open('meta_json.json', 'a') as fp:
+            fp.write(
+            '\n'.join(json.dumps(dict) for dict in dicts) + '\n')
 
 # Push to data table on OpenSearch
 headers = {
@@ -57,9 +55,10 @@ with open('meta_json.json', 'rb') as f:
 response = requests.post('https://search-gh-test-mn2dq77arhyercpvg3sgdihpnq.us-west-2.es.amazonaws.com/_bulk', 
                          headers=headers, data=data, auth=('ruthvik', 'Ruthvik-19'))
 
-print("OPensearch response \n ", response.json)
 
-print('\nUploaded to the data table')
+item_num = len(response.json()["items"])
+
+print(f"Pushed {item_num} data items to Opensearch")
 
 ## Look at logs
 
@@ -109,4 +108,6 @@ response = requests.post('https://search-gh-test-mn2dq77arhyercpvg3sgdihpnq.us-w
 
 print("OPensearch response \n ", response.json())
 
-print('\nUploaded to the logs table')
+item_num = len(response.json()["items"])
+
+print(f'\nUploaded {item_num} items to the logs table')
