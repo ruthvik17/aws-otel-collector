@@ -14,7 +14,7 @@ repo = os.environ['GITHUB_REPOSITORY']
 # Look at the workflow data
 
 try:
-    job_data = requests.get(f'https://api.github.com/repos/{repo}/actions/runs/{run_id}/jobs', headers=headers)
+    job_list = requests.get(f'https://api.github.com/repos/{repo}/actions/runs/{run_id}/jobs', headers=headers)
 except requests.exceptions.ConnectionError:
     print("Connection refused. Sleeping.......")
     sleep(0.5)
@@ -57,7 +57,7 @@ with open('meta_json.json', 'rb') as f:
 response = requests.post('https://search-gh-test-mn2dq77arhyercpvg3sgdihpnq.us-west-2.es.amazonaws.com/_bulk', 
                          headers=headers, data=data, auth=('ruthvik', 'Ruthvik-19'))
 
-# print("OPensearch response \n ", response.json())
+print("OPensearch response \n ", response.json)
 
 print('\nUploaded to the data table')
 
@@ -77,7 +77,7 @@ for job in job_data["jobs"]:
     id_no += 1
     # print(job_id)
     try:
-        job_log = requests.get(f'https://api.github.com/repos/ruthvik17/aws-otel-collector/actions/jobs/{job_id}/logs', headers=headers)
+        job_log = requests.get(f'https://api.github.com/repos/{repo}/actions/jobs/{job_id}/logs', headers=headers)
     except requests.exceptions.ConnectionError:
         print("Connection refused. Sleeping.......")
         sleep(0.5)
