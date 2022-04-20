@@ -11,6 +11,7 @@ env:
   TF_VAR_aws_secret_access_key: ${{ secrets.AWS_KEY_SECRET }}
   TF_VAR_patch: 'true'
   PAT_ACCESS: ${{ secrets.PAT_ACCESS}}
+  OS_ENDPOINT: ${{ secrets.OS_ENDPOINT }}
   TESTING_FRAMEWORK_REPO: aws-observability/aws-otel-test-framework
   SCRIPT_REPO: ruthvik17/aws-otel-collector
   ARTIFACT_DIR: /home/runner/work/aws-otel-collector/aws-otel-collector
