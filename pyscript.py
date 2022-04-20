@@ -62,7 +62,7 @@ with open('meta_json_data.json', 'rb') as f:
     data = f.read()
 
 response = requests.post(f'{OS_endpt}/_bulk', 
-                         headers=headers, data=data, auth=(os.environ['Test_user'], os.environ['Test_pass']))
+                         headers=headers, data=data, auth= awsauth)
 
 
 item_num = len(response.json()["items"])
@@ -127,7 +127,7 @@ with open('meta_json_data.json', 'rb') as f:
     data = f.read()
 
 response = requests.post(f'{OS_endpt}/_bulk', 
-                         headers=headers, data=data, auth=(os.environ['Test_user'], os.environ['Test_pass']))
+                         headers=headers, data=data, auth=awsauth)
 item_num = len(response.json()["items"])
 
 print(f'\nUploaded {item_num} items to the logs table')
