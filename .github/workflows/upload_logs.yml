@@ -147,8 +147,8 @@ jobs:
             
         - name: Install requests
           if: ${{ always() }}
-          run: python -m pip install requests
-          
+          run: python -m pip install requests botocore boto3 opensearchpy
+
         - name: Run pyscript
           if: ${{ always() }}
           run: python ${{ env.SCRIPT_REPO }}/pyscript.py
