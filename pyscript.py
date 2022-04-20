@@ -1,8 +1,10 @@
 import json
-import sys
 import os
-import requests
+import sys
 from time import sleep
+import boto3
+import requests
+from opensearchpy import OpenSearch, RequestsHttpConnection, AWSV4SignerAuth
 
 headers = {
     'Accept': 'application/vnd.github.v3+json',
@@ -40,7 +42,7 @@ for job in job_data["jobs"]:
         dict2 = {"index" : { "_index": "workflow_data", "_id" : id_no } }
         dicts = [dict2, dict1]
         # Write to file
-        with open('meta_json.json', 'a') as fp:
+        with open('meta_json_data.json', 'a') as fp:
             fp.write(
             '\n'.join(json.dumps(dict) for dict in dicts) + '\n')
 
@@ -51,10 +53,15 @@ headers = {
     'Content-Type': 'application/json',
 }
 
-with open('meta_json.json', 'rb') as f:
+credentials = boto3.Session().get_credentials()
+region = 'us-west-2' # e.g. us-west-1
+awsauth = AWSV4SignerAuth(credentials, region)
+OS_endpt = os.environ['OS_endpt']    
+
+with open('meta_json_data.json', 'rb') as f:
     data = f.read()
 
-response = requests.post('https://search-gh-test-mn2dq77arhyercpvg3sgdihpnq.us-west-2.es.amazonaws.com/_bulk', 
+response = requests.post(f'{OS_endpt}/_bulk', 
                          headers=headers, data=data, auth=(os.environ['Test_user'], os.environ['Test_pass']))
 
 
@@ -78,38 +85,49 @@ for job in job_data["jobs"]:
     id_no += 1
     # print(job_id)
     try:
-        job_log = requests.get(f'https://api.github.com/repos/{repo}/actions/jobs/{job_id}/logs', headers=headers)
+        job_log = requests.get(f'https://api.github.com/repos/aws-observability/aws-otel-collector/actions/jobs/{job_id}/logs', headers=headers)
     except requests.exceptions.ConnectionError:
         print("Connection refused. Sleeping.......")
         sleep(0.5)
 
-    dict1 = {}
-    dict1["job_id"] = job["id"]
-    dict1["run_id"] = job["run_id"]
-    dict1['job_run_attempt'] = job['run_attempt']
-    dict1['job_status'] = job['status']
-    dict1['job_conclusion'] = job['conclusion']
-    dict1['logs'] = f"{job_log.text}"
+    for log in job_log.text.split("\n"):
+        dict1 = {}
+        dict1["job_id"] = job["id"]
+        dict1["run_id"] = job["run_id"]
+        dict1['job_run_attempt'] = job['run_attempt']
+        dict1['job_status'] = job['status']
+        dict1['job_conclusion'] = job['conclusion']
+        log = log.split(' ', maxsplit = 1)
+        
+        if len(log) < 2:
+            dict1['log'] = f"{log[0]}"
+        else:    
+            dict1['time_log'] = f"{log[0]}"
+            dict1['log'] = f"{log[1]}"
 
-    dict2 = {"index" : { "_index": "workflow_logs", "_id" : f"{id_no}" } }
+        dict2 = {"index" : { "_index": "workflow_logs", "_id" : f"{id_no}" } }
 
-    dicts = [dict2, dict1]
+        dicts = [dict2, dict1]
 
-    with open('meta_json_logs.json', 'a') as fp:
-        fp.write(
-        '\n'.join(json.dumps(dict) for dict in dicts) + '\n')
+        with open('meta_json_logs.json', 'a') as fp:
+            fp.write(
+            '\n'.join(json.dumps(dict) for dict in dicts) + '\n')
+
 
 headers = {
     'Content-Type': 'application/json',
 }
 
-with open('meta_json_logs.json', 'rb') as f:
+credentials = boto3.Session().get_credentials()
+region = 'us-west-2' # e.g. us-west-1
+awsauth = AWSV4SignerAuth(credentials, region)
+OS_endpt = os.environ['OS_endpt']    
+
+with open('meta_json_data.json', 'rb') as f:
     data = f.read()
 
-response = requests.post('https://search-gh-test-mn2dq77arhyercpvg3sgdihpnq.us-west-2.es.amazonaws.com/_bulk', headers=headers, data=data, auth=('ruthvik', 'Ruthvik-19'))
-
-print("OPensearch response \n ", response.json())
-
+response = requests.post(f'{OS_endpt}/_bulk', 
+                         headers=headers, data=data, auth=(os.environ['Test_user'], os.environ['Test_pass']))
 item_num = len(response.json()["items"])
 
 print(f'\nUploaded {item_num} items to the logs table')
