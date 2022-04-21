@@ -5,6 +5,7 @@ from time import sleep
 import boto3
 import requests
 from opensearchpy import OpenSearch, RequestsHttpConnection, AWSV4SignerAuth
+import uuid
 
 headers = {
     'Accept': 'application/vnd.github.v3+json',
@@ -39,7 +40,7 @@ for job in job_data["jobs"]:
             dict1[f'{key}_{info}'] = step[info]
             id_no += 1
             dict1[f'steps_{info}'] = step[info]
-        dict2 = {"index" : { "_index": "workflow_data", "_id" : id_no } }
+        dict2 = {"index" : { "_index": "workflow_data", "_id" : str(uuid.uuid4()) } }
         dicts = [dict2, dict1]
         # Write to file
         with open('meta_json_data.json', 'a') as fp:
@@ -105,7 +106,7 @@ for job in job_data["jobs"]:
             dict1['time_log'] = f"{log[0]}"
             dict1['log'] = f"{log[1]}"
 
-        dict2 = {"index" : { "_index": "workflow_logs", "_id" : f"{id_no}" } }
+        dict2 = {"index" : { "_index": "workflow_logs", "_id" : str(uuid.uuid4()) } }
 
         dicts = [dict2, dict1]
 
