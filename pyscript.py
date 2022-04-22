@@ -124,7 +124,7 @@ region = 'us-west-2' # e.g. us-west-1
 awsauth = AWSV4SignerAuth(credentials, region)
 OS_endpt = os.environ['OS_ENDPOINT'] 
 
-with open('meta_json_data.json', 'rb') as f:
+with open('meta_json_logs.json', 'rb') as f:
     data = f.read()
 
 response = requests.post(f'{OS_endpt}/_bulk', 
