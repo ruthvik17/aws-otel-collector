@@ -86,7 +86,7 @@ for job in job_data["jobs"]:
     id_no += 1
     # print(job_id)
     try:
-        job_log = requests.get(f'https://api.github.com/repos/aws-observability/aws-otel-collector/actions/jobs/{job_id}/logs', headers=headers)
+        job_log = requests.get(f'https://api.github.com/repos/{repo}/actions/jobs/{job_id}/logs', headers=headers)
     except requests.exceptions.ConnectionError:
         print("Connection refused. Sleeping.......")
         sleep(0.5)
