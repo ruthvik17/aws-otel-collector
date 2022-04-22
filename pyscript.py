@@ -114,7 +114,6 @@ for job in job_data["jobs"]:
             fp.write(
             '\n'.join(json.dumps(dict) for dict in dicts) + '\n')
 
-
 headers = {
     'Content-Type': 'application/json',
 }
@@ -127,6 +126,8 @@ OS_endpt = os.environ['OS_ENDPOINT']
 with open('meta_json_logs.json', 'rb') as f:
     data = f.read()
 
+print(data)
+    
 response = requests.post(f'{OS_endpt}/_bulk', 
                          headers=headers, data=data, auth=awsauth)
 item_num = len(response.json()["items"])
