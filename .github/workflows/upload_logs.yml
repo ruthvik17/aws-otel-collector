@@ -5,7 +5,6 @@ on:
     branches:
       - upload_logs_to_opensearch  
 
-
 env:
   TF_VAR_aws_access_key_id: ${{ secrets.AWS_KEY_ID }}
   TF_VAR_aws_secret_access_key: ${{ secrets.AWS_KEY_SECRET }}
