@@ -126,7 +126,7 @@ OS_endpt = os.environ['OS_ENDPOINT']
 with open('meta_json_logs.json', 'rb') as f:
     data = f.read()
 
-print(data)
+# print(data)
     
 response = requests.post(f'{OS_endpt}/_bulk', 
                          headers=headers, data=data, auth=awsauth)
